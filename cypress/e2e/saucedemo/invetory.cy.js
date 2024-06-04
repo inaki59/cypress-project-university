@@ -1,18 +1,21 @@
 describe('Inventario (Test Suite)', () => {
-  const username = 'standard_user'
-  const password = 'secret_sauce'
-  const baseUrl = 'https://www.saucedemo.com/'
 
-  beforeEach(() => {
-    cy.visit(baseUrl)
-    cy.get('#user-name').type(username)
-    cy.get('#password').type(password)
+  beforeEach(function () {
+   
+    cy.fixture("user").then((credentials)=>{
+      this.credentials=credentials;
+      cy.visit(this.credentials.base_url)
+      cy.get('#user-name').type(this.credentials.standard_user)
+      cy.get('#password').type(this.credentials.password)
+  })
+  
     cy.get('#login-button').click()
   })
 
   it('Validate the Number of Results', () => {
     // Validar que el número de productos mostrados es igual a 6
     cy.get('.inventory_item').should('have.length', 6)
+
   })
 
   it('Increase of Cart Value', () => {
