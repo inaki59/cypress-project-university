@@ -1,10 +1,12 @@
 {
   "name": "practica-5",
   "version": "1.0.0",
-  "description": "��#\u0000 \u0000c\u0000y\u0000p\u0000r\u0000e\u0000s\u0000s\u0000-\u0000p\u0000r\u0000o\u0000j\u0000e\u0000c\u0000t\u0000-\u0000u\u0000n\u0000i\u0000v\u0000e\u0000r\u0000s\u0000i\u0000t\u0000y\u0000\r\u0000 \u0000",
+  "description": "Proyecto de Cypress",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "cypress:chrome": "npx cypress run --browser chrome",
+    "cypress:custom": "echo 'Usage: npm run cypress:custom <spec-file>'"
   },
   "repository": {
     "type": "git",
