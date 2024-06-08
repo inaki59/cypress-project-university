@@ -1,40 +1,37 @@
-describe('template spec', () => {
-  beforeEach(function () {
-    cy.fixture("user").then((userData) => {
-      cy.visit(userData.base_url)
-      cy.get('#user-name').type(userData.standard_user)
-      cy.get('#password').type(userData.password)
-      cy.get('#login-button').click()
-    })
-  })
+const LoginPage = require('../../pages/Login');
+describe('login', () => {
+  const loginPage = new LoginPage();
+
+  beforeEach(() => {
+    loginPage.visitLoginPage();
+   
+  });
 
   it('visit page', () => {
-    cy.fixture("user").then((userData) => {
-      cy.visit(userData.base_url)
-      cy.url().should("eq", userData.base_url)
-      cy.title().should('eq', 'Swag Labs')
-    })
-  })
+    loginPage.visitPage();
+  });
 
   it('login unsuccessfully', () => {
-    cy.fixture("user").then((userData) => {
-      cy.visit(userData.base_url)
-      cy.get('#user-name').type(userData.standard_user)
-      cy.get('#password').type(userData.password_incorrect)
-      cy.get('#login-button').click()
-      cy.get('.error-message-container').should('be.visible')
-        .and('contain', 'Username and password do not match any user in this service')
-    })
+    loginPage.loginWithIncorrectPassword();
+    loginPage.verifyErrorMessage("Username and password do not match any user in this service")
+  });
+  it('login without credential',()=>{
+    loginPage.loginEmpty();
+    loginPage.verifyErrorMessage("Username is required")
+  })
+  it('login without password',()=>{
+    loginPage.loginWithoutPassword();
+    loginPage.verifyErrorMessage("Password is required")
+  })
+  it('simbol error appear',()=>{
+    loginPage.loginWithoutPassword()
+    loginPage.verifyErrorSimbol()
   })
 
   it('login successfully', () => {
-    cy.fixture("user").then((userData) => {
-    cy.visit(userData.base_url)
-    cy.get('#user-name').type(userData.standard_user)
-    cy.get('#password').type(userData.password)
-    cy.get('#login-button').click()
-    cy.url().should('include', '/inventory.html')
-    cy.get('.inventory_list').should('be.visible')
-     })
-  })
-})
+    loginPage.login();
+    loginPage.verifySuccessfulLogin();
+  });
+
+});
+

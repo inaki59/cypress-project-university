@@ -1,56 +1,60 @@
-describe('Inventario (Test Suite)', () => {
+const Inventory = require('../../pages/Inventory');
 
-  beforeEach(function () {
-   
-    cy.fixture("user").then((credentials)=>{
-      this.credentials=credentials;
-      cy.visit(this.credentials.base_url)
-      cy.get('#user-name').type(this.credentials.standard_user)
-      cy.get('#password').type(this.credentials.password)
-  })
-  
-    cy.get('#login-button').click()
-  })
+describe('inventory', () => {
+    const inventory = new Inventory();
+    beforeEach(() => {
+        inventory.visitInventoryPage();
+    });
 
-  it('Validate the Number of Results', () => {
-    // Validar que el número de productos mostrados es igual a 6
-    cy.get('.inventory_item').should('have.length', 6)
+    it('Validate the Number of Results', () => {
+        inventory.validateNumberOfResults(6);
+    });
+    it('Check Remove Button Visibility and Persistency', () => {
+         inventory.addToCart('Sauce Labs Backpack');
+         inventory.verifyRemoveButtonVisibility('Sauce Labs Backpack');
+         inventory.visitInventoryPage();
+         inventory.verifyRemoveButtonVisibility('Sauce Labs Backpack');
+    });
 
-  })
-
-  it('Increase of Cart Value', () => {
-    // Agregar al carrito el producto Sauce Labs Bolt T-Shirt
-    cy.contains('.inventory_item', 'Sauce Labs Bolt T-Shirt')
-      .contains('Add to cart')
-      .click()
     
-    // Validamos que en el icono del carrito se ha agregado el valor 1
-    cy.get('.shopping_cart_badge').should('have.text', '1')
-  })
+    it('Increase of Cart Value', () => {
+        inventory.addToCart('Sauce Labs Bolt T-Shirt');
+        inventory.verifyCartBadgeValue('1');
+    });
+    it("menu are enabled",()=>{
+        inventory.clickToMenu();
+    })
+    it('Visibility of Remove Product Button', () => {
+        inventory.addToCart('Sauce Labs Onesie');
+        inventory.verifyRemoveButtonVisibility('Sauce Labs Onesie');
+    });
 
-  it('Visibility of Remove Product Button', () => {
-    // Agregar al carrito el producto Sauce Labs Onesie
-    cy.contains('.inventory_item', 'Sauce Labs Onesie')
-      .contains('Add to cart')
-      .click()
+    it('Remove product from the cart', () => {
+        inventory.addToCart('Sauce Labs Onesie');
+        inventory.removeProductFromCart('Sauce Labs Onesie');
+        inventory.verifyCartIconNotExist();
+    });
     
-    // Validamos que, al agregar el producto, se visualiza el botón REMOVE
-    cy.contains('.inventory_item', 'Sauce Labs Onesie')
-      .contains('Remove')
-      .should('be.visible')
-  })
-  it('Remove product from the cart', () => {
-    // Add the product "Sauce Labs Onesie" to the cart
-    cy.contains('.inventory_item', 'Sauce Labs Onesie')
-      .contains('Add to cart')
-      .click()
 
-    // Remove the product from the cart
-    cy.contains('.inventory_item', 'Sauce Labs Onesie')
-      .contains('Remove')
-      .click()
+    it('Sort Products Alphabetically (A to Z)', () => {
+        inventory.selectSortOption('az');
+        inventory.getProductNames();
+      });
+    it('Sort Products Alphabetically (Z to A)', () => {
+        inventory.selectSortOption('za');
+        inventory.getProductNameRevert();
+    });
+    it('sort Product price low to hight  (low to high)',()=>{
+        inventory.selectSortOption('lohi');
+        inventory.getProductLowPricesAndVerify()
+    })
+    it('sort Product price higth to low  (high to low)',()=>{
+        inventory.selectSortOption('hilo');
+        inventory.getProductHighPricesAndVerify()
+    })
+    it("buy product",()=>{
+        inventory.addToCart('Sauce Labs Onesie');
+        inventory.makeBuy();
+    })
     
-    // Validate that the cart icon no longer shows the product
-    cy.get('.shopping_cart_badge').should('not.exist')
-  })
-})
+});

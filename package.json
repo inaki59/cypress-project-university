@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/inaki59/cypress-project-university#readme",
   "devDependencies": {
-    "cypress": "^13.10.0"
+    "cypress": "^13.10.0",
+    "cypress-mochawesome-reporter": "^3.8.2"
   }
 }
