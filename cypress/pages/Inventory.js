@@ -61,46 +61,60 @@ class Inventory {
         cy.get('select[data-test="product-sort-container"]').select(value);
       }
       getProductNames() {
-        cy.wait(100)
-        let productNames = [];
-        //add productos
-        cy.get('div[data-test="inventory-item-name"]').each(($name) => {
-            productNames.push($name.text());
-          })
-          //compare array should be same
-          const sortedNames = [...productNames].sort();
-          expect(productNames).to.deep.equal(sortedNames, 'arrays are same');
-    }
-    getProductNameRevert() {
-        cy.wait(100)
-        let productNames = [];
-        //add productos
-        cy.get('div[data-test="inventory-item-name"]').each(($name) => {
-            productNames.push($name.text());
-          })
-          //compare array should be same
-          const sortedNames = [...productNames].sort().reverse();
-          expect(productNames).to.deep.equal(sortedNames, 'arrays are same');
-    }
-    getProductLowPricesAndVerify() {
-        cy.wait(100); 
-        cy.get('div[data-test="inventory-item-price"]').then($prices => {
-            let productPrices = $prices.map((index, html) => parseFloat(Cypress.$(html).text().replace('$', ''))).get();
-            let sortedPrices = [...productPrices].sort((a, b) => a - b);
-            expect(productPrices).to.deep.equal(sortedPrices, 'Los precios de productos deberían estar ordenados de menor a mayor');
-        });
-    }
-    getProductHighPricesAndVerify() {
-        cy.wait(100);  // Espera breve para estabilizar la página si es necesario
+        cy.wait(100); // Espera breve para estabilización, si es necesario
     
-        // Recoger los precios y almacenarlos en un array
-        cy.get('div[data-test="inventory-item-price"]').then($prices => {
-            let productPrices = $prices.map((index, html) => parseFloat(Cypress.$(html).text().replace('$', ''))).get();
-            let sortedPrices = [...productPrices].sort((a, b) => b - a);
-            // Aserción para verificar que los precios están ordenados de mayor a menor
-            expect(productPrices).to.deep.equal(sortedPrices, 'Los precios de productos deberían estar ordenados de mayor a menor');
+        // Recolectar y procesar los nombres de los productos directamente
+        cy.get('div[data-test="inventory-item-name"]').should('have.length.gt', 1).each(($name, index, $list) => {
+            if (index > 0) {
+                // Obtener el nombre actual y el nombre anterior
+                //const currentName = $name.text().trim();
+                //const previousName = Cypress.$($list[index - 1]).text().trim();
+                expect(Cypress.$($list[index - 1]).text().trim().localeCompare($name.text().trim()))
+                .to.be.at.most(0, `El nombre '${Cypress.$($list[index - 1]).text().trim()}' debería venir alfabéticamente antes que '${ $name.text().trim()}'`);
+            }
         });
     }
+    
+    getProductNameRevert() {
+        cy.wait(100); 
+    
+        // Recolectar y procesar los nombres de los productos directamente
+        cy.get('div[data-test="inventory-item-name"]').should('have.length.gt', 1).each(($name, index, $list) => {
+            if (index > 0) {
+                // Obtener el nombre actual y el nombre anterior y comparar en orden inverso
+                expect(Cypress.$($list[index - 1]).text().trim().localeCompare($name.text().trim()))
+                    .to.be.at.least(0, `El nombre '${Cypress.$($list[index - 1]).text().trim()}' debería venir alfabéticamente después que '${ $name.text().trim()}'`);
+            }
+        });
+    }
+    
+    getProductLowPricesAndVerify() {
+        cy.wait(100); // Espera breve para estabilización, si es necesario
+    
+        // Recolectar y procesar los precios de los productos directamente
+        cy.get('div[data-test="inventory-item-price"]').should('have.length.gt', 1).each(($price, index, $list) => {
+            if (index > 0) {
+                // Comparar el precio actual con el precio anterior
+                cy.wrap(Cypress.$($list[index - 1])).invoke('text').then(previousPriceText => {
+                   // const previousPrice = parseFloat(previousPriceText.replace('$', '').trim());
+                   // const currentPrice = parseFloat($price.text().replace('$', '').trim());
+                    expect(parseFloat(previousPriceText.replace('$', '').trim())).to.be.at.most(parseFloat($price.text().replace('$', '').trim()), `El precio '${parseFloat(previousPriceText.replace('$', '').trim())}' debería ser menor o igual que '${parseFloat($price.text().replace('$', '').trim())}'`);
+                });
+            }
+        });
+    }
+    
+    getProductHighPricesAndVerify() {
+        cy.wait(100); 
+        cy.get('div[data-test="inventory-item-price"]').should('have.length.gt', 1).each(($price, index, $list) => {
+            if (index > 0) {
+                cy.wrap(Cypress.$($list[index - 1])).invoke('text').then(previousPriceText => {
+                    expect(parseFloat(previousPriceText.replace('$', '').trim())).to.be.at.least(parseFloat($price.text().replace('$', '').trim()), `El precio '${parseFloat(previousPriceText.replace('$', '').trim())}' debería ser mayor o igual que '${parseFloat($price.text().replace('$', '').trim())}'`);
+                });
+            }
+        });
+    }
+    
     
    
     
