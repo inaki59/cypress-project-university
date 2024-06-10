@@ -7,5 +7,6 @@
 "visual_user":"visual_user",
 "password": "secret_sauce",
 "password_incorrect":"12345",
+"empty":" ",
 "base_url":"https://www.saucedemo.com/"
 }
