@@ -61,8 +61,6 @@ class Inventory {
         cy.get('select[data-test="product-sort-container"]').select(value);
       }
       getProductNames() {
-        cy.wait(100); // Espera breve para estabilización, si es necesario
-    
         // Recolectar y procesar los nombres de los productos directamente
         cy.get('div[data-test="inventory-item-name"]').should('have.length.gt', 1).each(($name, index, $list) => {
             if (index > 0) {
@@ -76,12 +74,8 @@ class Inventory {
     }
     
     getProductNameRevert() {
-        cy.wait(100); 
-    
-        // Recolectar y procesar los nombres de los productos directamente
         cy.get('div[data-test="inventory-item-name"]').should('have.length.gt', 1).each(($name, index, $list) => {
             if (index > 0) {
-                // Obtener el nombre actual y el nombre anterior y comparar en orden inverso
                 expect(Cypress.$($list[index - 1]).text().trim().localeCompare($name.text().trim()))
                     .to.be.at.least(0, `El nombre '${Cypress.$($list[index - 1]).text().trim()}' debería venir alfabéticamente después que '${ $name.text().trim()}'`);
             }
@@ -89,9 +83,6 @@ class Inventory {
     }
     
     getProductLowPricesAndVerify() {
-        cy.wait(100); // Espera breve para estabilización, si es necesario
-    
-        // Recolectar y procesar los precios de los productos directamente
         cy.get('div[data-test="inventory-item-price"]').should('have.length.gt', 1).each(($price, index, $list) => {
             if (index > 0) {
                 // Comparar el precio actual con el precio anterior
@@ -105,7 +96,6 @@ class Inventory {
     }
     
     getProductHighPricesAndVerify() {
-        cy.wait(100); 
         cy.get('div[data-test="inventory-item-price"]').should('have.length.gt', 1).each(($price, index, $list) => {
             if (index > 0) {
                 cy.wrap(Cypress.$($list[index - 1])).invoke('text').then(previousPriceText => {
